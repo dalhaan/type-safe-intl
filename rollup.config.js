@@ -10,17 +10,10 @@ export default defineConfig([
   {
     input: "src/index.ts",
     output: [
-      // {
-      //   dir: "lib/es",
-      //   format: "esm",
-      //   preserveModules: true,
-      //   entryFileNames: "[name].mjs",
-      // },
       {
         dir: "dist/cjs",
         format: "cjs",
         entryFileNames: "[name].js",
-        // preserveModules: true,
       },
     ],
     plugins: [
