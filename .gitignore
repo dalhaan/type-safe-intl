@@ -1,2 +1,5 @@
 node_modules
-output
+lib
+
+# Mac
+.DS_Store
