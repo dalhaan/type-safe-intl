@@ -23,7 +23,7 @@
   "private": true,
   "scripts": {
     "start": "node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
-    "build": "rm -rf dist && rollup --config rollup.config.js",
+    "build": "rm -rf dist && rollup -c",
     "test": "jest",
     "check:lint": "eslint .",
     "check:types": "tsc --noEmit",

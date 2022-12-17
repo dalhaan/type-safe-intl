@@ -5,6 +5,13 @@ import { defineConfig } from "rollup";
 import del from "rollup-plugin-delete";
 import dts from "rollup-plugin-dts";
 
+import pkg from "./package.json" assert { type: "json" };
+
+const external = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+];
+
 export default defineConfig([
   // CJS
   {
@@ -16,6 +23,7 @@ export default defineConfig([
         entryFileNames: "[name].js",
       },
     ],
+    external,
     plugins: [
       typescript(),
       nodeResolve(),
@@ -33,6 +41,7 @@ export default defineConfig([
         entryFileNames: "[name].mjs",
       },
     ],
+    external,
     plugins: [
       typescript({
         declaration: true, // Generate type declarations for the last step which bundles them into one
