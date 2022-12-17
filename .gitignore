@@ -1,5 +1,9 @@
 node_modules
+
+# Build outputs
 dist
+lib
+types
 
 # Mac
 .DS_Store
