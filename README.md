@@ -26,8 +26,10 @@ Run locally:
 yarn start
 ```
 
-Build:
+## Building
 
 ```bash
 yarn build
 ```
+
+Builds to "lib".
