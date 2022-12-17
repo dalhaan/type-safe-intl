@@ -1,5 +1,4 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
-// import terser from "@rollup/plugin-terser";
 import { defineConfig } from "rollup";
 import dts from "rollup-plugin-dts";
 
@@ -22,10 +21,7 @@ export default defineConfig([
         exports: "named",
       },
     ],
-    plugins: [
-      nodeResolve(),
-      // terser({ module: true })
-    ],
+    plugins: [nodeResolve()],
     external,
   },
   // ES
@@ -41,10 +37,7 @@ export default defineConfig([
       },
     ],
 
-    plugins: [
-      nodeResolve(),
-      // terser({ module: true })
-    ],
+    plugins: [nodeResolve()],
     external,
   },
   // Bundle types into single index.d.ts
