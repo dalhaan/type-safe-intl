@@ -1,5 +1,5 @@
 {
-  "name": "rollup-node-cli-starter",
+  "name": "rollup-node-starter",
   "version": "0.1.0",
   "description": "A starter boilerplate project for building a Node tool with Rollup.",
   "type": "module",
