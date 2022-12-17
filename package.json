@@ -4,6 +4,7 @@
   "description": "A starter boilerplate project for building a Node tool with Rollup.",
   "type": "module",
   "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "exports": "./lib/index.js",
   "files": [
     "lib"
