@@ -4,5 +4,8 @@
   "exclude": ["node_modules"],
   "compilerOptions": {
     "rootDir": "src"
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }

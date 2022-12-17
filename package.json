@@ -22,7 +22,7 @@
   "repository": "https://github.com/dalhaan/rollup-node-starter",
   "private": true,
   "scripts": {
-    "start": "ts-node --esm src/index.ts",
+    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
     "build": "rm -rf dist && rollup --config rollup.config.js",
     "test": "jest",
     "check:lint": "eslint .",
