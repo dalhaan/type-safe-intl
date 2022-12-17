@@ -14,7 +14,7 @@
   "private": true,
   "scripts": {
     "start": "ts-node --esm src/index.ts",
-    "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --bundleConfigAsCjs"
+    "build": "rollup --config rollup.config.js --bundleConfigAsCjs"
   },
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
