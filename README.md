@@ -34,4 +34,4 @@ yarn start
 yarn build
 ```
 
-Builds to "lib".
+Builds to "dist".
