@@ -34,10 +34,22 @@ export default defineConfig([
         format: "esm",
         exports: "named",
         preserveModules: true,
-        banner: "#!/usr/bin/env node", // CLI support, remove if project is not a CLI
       },
     ],
-
+    plugins: [nodeResolve()],
+    external,
+  },
+  // CLI
+  {
+    input: "lib/cli.js",
+    output: [
+      {
+        file: "dist/cli/index.js",
+        format: "esm",
+        exports: "named",
+        banner: "#!/usr/bin/env node",
+      },
+    ],
     plugins: [nodeResolve()],
     external,
   },

@@ -1,6 +1,30 @@
 # Rollup Node Starter
 
-A starter boilerplate project for building a Node tool with Rollup.
+A starter boilerplate project for building an NPM package with Rollup.
+
+This boilerplate supports building a package that can be imported as an ES or CJS module, and also be used as a CLI.
+
+## Import as ES module
+
+To import this package as an ES module, all you need to do is add `"type": "module"` to your package.json.
+
+When package managers see this they will read the package's "module" field in its package.json and import that file.
+
+## Import as CJS module
+
+To import this package as an ES module, all you need to do is omit the "type" field or add `"type": "commonjs"` to your package.json.
+
+When package managers see this they will read the package's "main" field in its package.json and import that file.
+
+## Using as a CLI
+
+To use this package as a CLI, use the package's name (the "name" field in the package.json) as the command in either your "scripts" field in your package.json or by running:
+
+```bash
+npx <package name>
+```
+
+The package manager will read the "bin" field in the package's package.json and execute that. The top of the file indicates what kind of runtime it requires to run. In our case: `#!/usr/bin/env node`.
 
 ## Getting started
 

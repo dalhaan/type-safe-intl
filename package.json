@@ -14,7 +14,7 @@
       "default": "./dist/cjs/index.js"
     }
   },
-  "bin": "./dist/es/index.mjs",
+  "bin": "./dist/cli/index.js",
   "files": [
     "dist"
   ],
