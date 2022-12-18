@@ -34,6 +34,7 @@ export default defineConfig([
         format: "esm",
         exports: "named",
         preserveModules: true,
+        banner: "#!/usr/bin/env node",
       },
     ],
 
