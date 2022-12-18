@@ -34,7 +34,7 @@ export default defineConfig([
         format: "esm",
         exports: "named",
         preserveModules: true,
-        banner: "#!/usr/bin/env node",
+        banner: "#!/usr/bin/env node", // CLI support, remove if project is not a CLI
       },
     ],
 

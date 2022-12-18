@@ -18,6 +18,8 @@ Install dependencies:
 yarn
 ```
 
+This boilerplate is set up for building a Node CLI tool by default. To remove CLI functionality remove the "bin" field from package.json and the "banner" field from the ESM build config in rollup.config.js
+
 ### Running
 
 Run locally:
