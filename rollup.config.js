@@ -1,4 +1,5 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 import { defineConfig } from "rollup";
 import dts from "rollup-plugin-dts";
 
@@ -50,7 +51,16 @@ export default defineConfig([
         banner: "#!/usr/bin/env node",
       },
     ],
-    plugins: [nodeResolve()],
+    plugins: [
+      nodeResolve(),
+      replace({
+        preventAssignment: true,
+        values: {
+          "process.env.ROLLUP_PKG_NAME": JSON.stringify(pkg.name),
+          "process.env.ROLLUP_PKG_DESC": JSON.stringify(pkg.description),
+        },
+      }),
+    ],
     external,
   },
   // Bundle types into single index.d.ts

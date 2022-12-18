@@ -24,7 +24,7 @@
   "repository": "https://github.com/dalhaan/rollup-node-starter",
   "private": true,
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
+    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm src/cli.ts",
     "build": "yarn clean && tsc -p . && rollup -c",
     "test": "jest",
     "clean": "rm -rf types lib dist",
@@ -36,6 +36,7 @@
   "devDependencies": {
     "@jest/globals": "^29.3.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.2",
     "@tsconfig/node18-strictest-esm": "^1.0.1",
     "@types/node": "^18.11.16",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
@@ -55,5 +56,8 @@
     "tsconfig-paths": "^4.1.1",
     "tslib": "^2.4.1",
     "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "commander": "^9.4.1"
   }
 }
