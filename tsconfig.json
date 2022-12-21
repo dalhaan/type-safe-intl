@@ -1,14 +1,15 @@
 {
   "extends": "@tsconfig/node18-strictest-esm/tsconfig.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "./jest.setup.ts"],
   "exclude": ["node_modules", "**/__tests__/*", "**/*.test.ts"],
   "compilerOptions": {
-    "rootDir": "src",
+    "rootDir": ".",
     "baseUrl": "src",
     "outDir": "lib",
     "declaration": true,
     "declarationDir": "types",
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    "jsx": "react"
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]
