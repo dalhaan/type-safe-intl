@@ -4,6 +4,8 @@ A fully type-safe internationalisation library for React without the need for co
 
 **TODO:**
   - [ ] Ability to pass values + plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+  - [ ] Cache Intl.* constructors
+  - [ ] Cache messages
   - [ ] Runtime validation
 
 ## Usage
