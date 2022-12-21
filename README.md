@@ -1,6 +1,6 @@
 # Type Safe Intl
 
-A fully type-safe internationalisation library without the need for code generation.
+A fully type-safe internationalisation library for React without the need for code generation.
 
 **TODO:**
   - [ ] Ability to pass values with type saftey
@@ -11,11 +11,15 @@ A fully type-safe internationalisation library without the need for code generat
 
 ```tsx
 // intl.ts
-import { createIntlFunctions, LocalesFromIntlProvider } from 'type-safe-intl';
+import { createIntlFunctions, LocalesFromIntlProvider } from "type-safe-intl";
 
-const { generateIntl, IntlProvider, useIntl } = createIntlFunctions<"en-nz" | "mi">();
+// Define your supported locales as a type
+type Locale = "en-nz" | "mi";
 
-type Locale = LocalesFromIntlProvider<typeof IntlProvider>; // 'en-nz' | 'mi'
+// Pass your locale type to `createIntlFunctions`.
+// `createIntlFunctions` passes the locale type info to all intl functions & hooks 
+// so they can enforce them.
+const { generateIntl, IntlProvider, useIntl } = createIntlFunctions<Locale>();
 
 export {
   generateIntl,
@@ -26,11 +30,12 @@ export {
 
 // app.tsx
 import { IntlProvider, Locale } from "./intl";
-import { Hello } from './hello';
+import { Hello } from "./hello";
 
 function App() {
   const locale = getLocalFromSomewhere<Locale>();
  
+  // `IntlProvider` uses context to tell `useIntl` what locale to use.
   return (
     <IntlProvider locale={locale}>
       <Hello />
@@ -41,18 +46,23 @@ function App() {
 // hello.tsx
 import { generateIntl, useIntl } from "./intl";
 
+// `generateIntl` enforces that all locales are provided and that they all have the same message ids.
 const messages = generateIntl({
-  'en-nz': {
-    hello: 'Hello!',
+  "en-nz": {
+    hello: "Hello!",
   },
-  'mi': {
-    hello: 'Kia ora!',
+  mi: {
+    hello: "Kia ora!",
   },
 });
 
 export function Hello() {
+  // `useIntl` returns a `formatMessage` function that returns the copy
+  // for a given message id for the current locale.
+  // It also enforces that the messages passed to it have all of the
+  // correct locales and they have the same message ids.
   const { formatMessage } = useIntl(messages);
 
-  return <h1>{formatMessage('hello')</h1>;
+  return <h1>{formatMessage("hello")</h1>;
 }
 ```
