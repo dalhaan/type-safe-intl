@@ -2,7 +2,13 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 
-import { IntlProvider, generateIntl, useIntl } from "../index";
+import { createIntlFunctions, LocalesFromIntlProvider } from "../index";
+
+const { generateIntl, IntlProvider, useIntl } = createIntlFunctions<
+  "en-nz" | "fr"
+>();
+
+type Locale = LocalesFromIntlProvider<typeof IntlProvider>;
 
 const intl = generateIntl({
   "en-nz": {
@@ -19,7 +25,7 @@ const Consumer = () => {
   return <div data-testid="output">{formatMessage("hello")}</div>;
 };
 
-const UI = ({ locale }: { locale: string }) => {
+const UI = ({ locale }: { locale: Locale }) => {
   const [localeState, setLocaleState] = React.useState(locale);
 
   const handleToggle = () =>
@@ -38,7 +44,7 @@ const UI = ({ locale }: { locale: string }) => {
   );
 };
 
-const setup = (locale: string) => {
+const setup = (locale: Locale) => {
   render(<UI locale={locale} />);
 
   const user = userEvent.setup();
