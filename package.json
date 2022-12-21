@@ -1,5 +1,5 @@
 {
-  "name": "rollup-node-starter",
+  "name": "type-safe-intl",
   "version": "0.1.0",
   "description": "A starter boilerplate project for building a Node tool with Rollup.",
   "type": "module",
@@ -14,7 +14,6 @@
       "default": "./dist/cjs/index.js"
     }
   },
-  "bin": "./dist/cli/index.js",
   "files": [
     "dist"
   ],

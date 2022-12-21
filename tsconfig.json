@@ -1,9 +1,9 @@
 {
   "extends": "@tsconfig/node18-strictest-esm/tsconfig.json",
-  "include": ["src/**/*", "./jest.setup.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "**/__tests__/*", "**/*.test.ts"],
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "src",
     "baseUrl": "src",
     "outDir": "lib",
     "declaration": true,
