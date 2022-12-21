@@ -2,7 +2,7 @@
 
 A fully type-safe internationalisation library without the need for code generation.
 
-TODO:
+**TODO:**
   - [ ] Ability to pass values with type saftey
   - [ ] Runtime validation
   - [ ] Plurals
