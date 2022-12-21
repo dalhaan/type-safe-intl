@@ -41,7 +41,7 @@ function App() {
 // hello.tsx
 import { generateIntl, useIntl } from "./intl";
 
-const intl = generateIntl({
+const messages = generateIntl({
   'en-nz': {
     hello: 'Hello!',
   },
@@ -51,7 +51,7 @@ const intl = generateIntl({
 });
 
 export function Hello() {
-  const { formatMessage } = useIntl(intl);
+  const { formatMessage } = useIntl(messages);
 
   return <h1>{formatMessage('hello')</h1>;
 }
