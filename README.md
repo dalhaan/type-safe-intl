@@ -4,9 +4,9 @@ A fully type-safe internationalisation library for React without the need for co
 
 **TODO:**
   - [ ] Enforce BCP 47 language tags for locales
-  - [ ] Add default locale resolution
+  - [ ] Add default locale resolution (maybe)
   - [ ] Ability to pass values + plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
-  - [ ] Support Date/Time/Number skeleton
+  - [ ] Support Date/Time/Number skeleton (maybe)
   - [ ] Cache Intl.* constructors
   - [ ] Cache messages
   - [ ] Runtime validation
