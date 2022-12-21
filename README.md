@@ -52,6 +52,7 @@ const intl = generateIntl({
 
 export function Hello() {
   const { formatMessage } = useIntl(intl);
+
   return <h1>{formatMessage('hello')</h1>;
 }
 ```
