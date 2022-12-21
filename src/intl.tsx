@@ -2,7 +2,7 @@
  * A fully type safe i18n library without the need for scripts to generate the types
  */
 
-import React from "react";
+import React, { PropsWithChildren } from "react";
 
 // const intl = {
 //     'en-nz': {
@@ -61,7 +61,15 @@ type IntlContextType = {
 
 const IntlContext = React.createContext<IntlContextType | undefined>(undefined);
 
-const IntlProvider = IntlContext.Provider;
+type IntlProviderType = PropsWithChildren<{
+  locale: string;
+}>;
+
+function IntlProvider({ locale, children }: IntlProviderType) {
+  return (
+    <IntlContext.Provider value={{ locale }}>{children}</IntlContext.Provider>
+  );
+}
 
 function useIntlContext() {
   const context = React.useContext(IntlContext);
