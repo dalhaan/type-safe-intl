@@ -17,19 +17,15 @@ A fully type-safe internationalisation library for React without the need for co
 
 ```tsx
 // intl.ts
-import { createIntlFunctions, LocalesFromIntlProvider } from "type-safe-intl";
+import { createIntl } from "type-safe-intl";
 
-// Define your supported locales
-const LOCALES = ["en-NZ", "mi"] as const;
-type Locale = (typeof LOCALES)[number]; // "en-NZ" | "mi"
-
-// Pass your supported locales to `createIntlFunctions`.
-// `createIntlFunctions` passes the locale type info to
+// Pass your supported locales to `createIntl`.
+// `createIntl` passes the locale type info to
 // all intl functions & hooks so they can enforce them.
-const { generateIntl, IntlProvider, useIntl } = createIntlFunctions(LOCALES);
+const { defineMessages, IntlProvider, useIntl } = createIntl(["en-NZ", "mi"]);
 
 export {
-  generateIntl,
+  defineMessages,
   IntlProvider,
   useIntl,
   Locale,
@@ -40,7 +36,7 @@ import { IntlProvider, Locale } from "./intl";
 import { Hello } from "./hello";
 
 function App() {
-  const locale = getLocalFromSomewhere<Locale>();
+  const locale = getLocalFromSomewhere<'en-NZ' | 'mi'>();
 
   // `IntlProvider` uses context to tell `useIntl` what locale to use.
   return (
@@ -51,10 +47,10 @@ function App() {
 }
 
 // hello.tsx
-import { generateIntl, useIntl } from "./intl";
+import { defineMessages, useIntl } from "./intl";
 
-// `generateIntl` enforces that all locales are provided and that they all have the same message ids.
-const messages = generateIntl({
+// `defineMessages` enforces that all locales are provided and that they all have the same message ids.
+const messages = defineMessages({
   "en-nz": {
     hello: "Hello!",
   },

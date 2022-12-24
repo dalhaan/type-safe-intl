@@ -19,7 +19,7 @@ import React from "react";
 
 type UnionKeys<U> = U extends U ? keyof U : never;
 
-function createIntlFunctions<
+function createIntl<
   LocaleType extends string,
   Locales extends LocaleType[],
   Locale extends Locales[number]
@@ -61,9 +61,10 @@ function createIntlFunctions<
   // generateIntl
   // ------------------------------------------------------------------
 
-  function generateIntl<Base, MessageKeys extends UnionKeys<Base[keyof Base]>>(
-    intl: Base & Record<Locale, Record<MessageKeys, string>>
-  ) {
+  function defineMessages<
+    Base,
+    MessageKeys extends UnionKeys<Base[keyof Base]>
+  >(intl: Base & Record<Locale, Record<MessageKeys, string>>) {
     return intl;
   }
 
@@ -88,7 +89,7 @@ function createIntlFunctions<
   return {
     IntlProvider,
     useIntl,
-    generateIntl,
+    defineMessages,
   };
 }
 
@@ -127,5 +128,5 @@ type LocalesFromIntlProvider<IntlProvider extends (...args: any) => any> =
 
 // ------------------------------------------------------------------
 
-export { createIntlFunctions };
+export { createIntl };
 export type { LocalesFromIntlProvider };

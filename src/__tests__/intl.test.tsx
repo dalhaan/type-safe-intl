@@ -2,14 +2,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 
-import { createIntlFunctions } from "../index";
+import { createIntl } from "../index";
 
 const Consumer = ({
   useIntl,
   messages,
 }: {
-  useIntl: ReturnType<typeof createIntlFunctions>["useIntl"];
-  messages: ReturnType<ReturnType<typeof createIntlFunctions>["generateIntl"]>;
+  useIntl: ReturnType<typeof createIntl>["useIntl"];
+  messages: ReturnType<ReturnType<typeof createIntl>["defineMessages"]>;
 }) => {
   const { formatMessage } = useIntl(messages) as any;
 
@@ -26,12 +26,12 @@ const UI = ({
 }: {
   locale: string;
   locales: string[];
-  messages: ReturnType<ReturnType<typeof createIntlFunctions>["generateIntl"]>;
+  messages: ReturnType<ReturnType<typeof createIntl>["defineMessages"]>;
 }) => {
   const [localeState, setLocaleState] = React.useState(locale);
-  const { IntlProvider, generateIntl, useIntl } = createIntlFunctions(locales);
+  const { IntlProvider, defineMessages, useIntl } = createIntl(locales);
 
-  const messagesIntl = generateIntl(messages);
+  const messagesIntl = defineMessages(messages);
 
   return (
     <IntlProvider locale={localeState}>
@@ -53,7 +53,7 @@ const UI = ({
 const setup = (
   locale: string,
   locales: string[],
-  messages: ReturnType<ReturnType<typeof createIntlFunctions>["generateIntl"]>
+  messages: ReturnType<ReturnType<typeof createIntl>["defineMessages"]>
 ) => {
   render(<UI locale={locale} locales={locales} messages={messages} />);
 
