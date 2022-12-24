@@ -19,6 +19,21 @@ export default defineConfig([
         dir: "dist/cjs",
         format: "cjs",
         exports: "named",
+        sourcemap: true,
+      },
+    ],
+    plugins: [nodeResolve()],
+    external,
+  },
+  // UMD
+  {
+    input: "lib/index.js",
+    output: [
+      {
+        file: "dist/umd/type-safe-intl.js",
+        name: "TypeSafeIntl",
+        format: "umd",
+        exports: "named",
       },
     ],
     plugins: [nodeResolve()],
@@ -34,6 +49,7 @@ export default defineConfig([
         format: "esm",
         exports: "named",
         preserveModules: true,
+        sourcemap: true,
       },
     ],
     plugins: [nodeResolve()],
