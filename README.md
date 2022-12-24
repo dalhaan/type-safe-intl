@@ -19,13 +19,14 @@ A fully type-safe internationalisation library for React without the need for co
 // intl.ts
 import { createIntlFunctions, LocalesFromIntlProvider } from "type-safe-intl";
 
-// Define your supported locales as a type
-type Locale = "en-nz" | "mi";
+// Define your supported locales
+const LOCALES = ["en-NZ", "mi"] as const;
+type Locale = (typeof LOCALES)[number]; // "en-NZ" | "mi"
 
-// Pass your locale type to `createIntlFunctions`.
-// `createIntlFunctions` passes the locale type info to all intl functions & hooks
-// so they can enforce them.
-const { generateIntl, IntlProvider, useIntl } = createIntlFunctions<Locale>();
+// Pass your supported locales to `createIntlFunctions`.
+// `createIntlFunctions` passes the locale type info to
+// all intl functions & hooks so they can enforce them.
+const { generateIntl, IntlProvider, useIntl } = createIntlFunctions(LOCALES);
 
 export {
   generateIntl,
