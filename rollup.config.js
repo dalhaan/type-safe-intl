@@ -39,6 +39,7 @@ export default defineConfig([
     ],
     plugins: [
       esbuild({
+        target: "es6",
         minify: true,
       }),
     ],
