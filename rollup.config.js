@@ -1,6 +1,7 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { defineConfig } from "rollup";
 import dts from "rollup-plugin-dts";
+import esbuild from "rollup-plugin-esbuild";
 
 import pkg from "./package.json" assert { type: "json" };
 
@@ -36,7 +37,11 @@ export default defineConfig([
         exports: "named",
       },
     ],
-    plugins: [nodeResolve()],
+    plugins: [
+      esbuild({
+        minify: true,
+      }),
+    ],
     external,
   },
   // ES
