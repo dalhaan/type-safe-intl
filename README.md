@@ -3,13 +3,15 @@
 A fully type-safe internationalisation library for React without the need for code generation.
 
 **TODO:**
-  - [ ] Enforce BCP 47 language tags for locales
-  - [ ] Add default locale resolution (maybe)
-  - [ ] Ability to pass values + plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
-  - [ ] Support Date/Time/Number skeleton (maybe)
-  - [ ] Cache Intl.* constructors
-  - [ ] Cache messages
-  - [ ] Runtime validation
+
+- [x] Enforce BCP 47 language tags for locales (at runtime, there are way too many to use types)
+  - Using `Intl.getCanonicalLocales` to validate locale at runtime.
+- [ ] Add default locale resolution (maybe)
+- [ ] Ability to pass values + plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [ ] Support Date/Time/Number skeleton (maybe)
+- [ ] Cache Intl.\* constructors
+- [ ] Cache messages
+- [ ] Runtime validation
 
 ## Usage
 
@@ -21,7 +23,7 @@ import { createIntlFunctions, LocalesFromIntlProvider } from "type-safe-intl";
 type Locale = "en-nz" | "mi";
 
 // Pass your locale type to `createIntlFunctions`.
-// `createIntlFunctions` passes the locale type info to all intl functions & hooks 
+// `createIntlFunctions` passes the locale type info to all intl functions & hooks
 // so they can enforce them.
 const { generateIntl, IntlProvider, useIntl } = createIntlFunctions<Locale>();
 
@@ -38,7 +40,7 @@ import { Hello } from "./hello";
 
 function App() {
   const locale = getLocalFromSomewhere<Locale>();
- 
+
   // `IntlProvider` uses context to tell `useIntl` what locale to use.
   return (
     <IntlProvider locale={locale}>

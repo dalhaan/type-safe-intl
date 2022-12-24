@@ -9,7 +9,8 @@
     "declaration": true,
     "declarationDir": "types",
     "noPropertyAccessFromIndexSignature": false,
-    "jsx": "react"
+    "jsx": "react",
+    "lib": ["DOM"]
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]

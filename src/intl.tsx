@@ -19,7 +19,13 @@ import React from "react";
 
 type UnionKeys<U> = U extends U ? keyof U : never;
 
-function createIntlFunctions<Locale extends string>() {
+function createIntlFunctions<
+  LocaleType extends string,
+  Locales extends LocaleType[],
+  Locale extends Locales[number]
+>(locales: Locales) {
+  validateLocales(locales);
+
   // ------------------------------------------------------------------
   // IntlContext
   // ------------------------------------------------------------------
@@ -84,6 +90,33 @@ function createIntlFunctions<Locale extends string>() {
     useIntl,
     generateIntl,
   };
+}
+
+/**
+ * Validates an array of locales.
+ * Throws an error if they either don't exist or are of the incorrect format.
+ */
+function validateLocales(locales: string[]) {
+  const errors: string[] = [];
+
+  for (const localeTag of locales) {
+    try {
+      // const locale = new Intl.Locale(localeTag); // Throws error if invalid locale.
+      const canonicalLocale = Intl.getCanonicalLocales(localeTag); // Throws error if invalid locale.
+
+      // Throw error if locale doesn't exactly match BCP47 format.
+      if (localeTag !== canonicalLocale[0])
+        errors.push(
+          `Invalid locale: "${localeTag}", did you mean "${canonicalLocale[0]}"`
+        );
+    } catch (incorrectLocaleError) {
+      errors.push(`Invalid locale: "${localeTag}"`);
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(errors.join("\n"));
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
