@@ -2,7 +2,7 @@
  * A fully type safe i18n library without the need for scripts to generate the types
  */
 
-import IntlMessageFormat from "intl-messageformat";
+import { IntlMessageFormat, PrimitiveType } from "intl-messageformat";
 import React from "react";
 
 // const intl = {
@@ -78,11 +78,13 @@ function createIntl<
   ) {
     const { locale } = useIntlContext();
 
-    function formatMessage(
-      id: MessageKeys,
-      values: Parameters<IntlMessageFormat["format"]>[0]
-    ) {
-      // return intl[locale][id] as string;
+    function formatMessage<
+      Values extends Record<string, PrimitiveType | undefined>
+    >(id: MessageKeys, values: Values) {
+      if (!values) {
+        return intl[locale][id] as string;
+      }
+
       return new IntlMessageFormat(intl[locale][id], locale).format(values);
     }
 
