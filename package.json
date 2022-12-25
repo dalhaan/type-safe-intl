@@ -67,5 +67,8 @@
   },
   "peerDependencies": {
     "react": "^16.8 || ^17.0 || ^18.0"
+  },
+  "dependencies": {
+    "intl-messageformat": "^10.2.5"
   }
 }
