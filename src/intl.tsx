@@ -2,11 +2,7 @@
  * A fully type safe i18n library without the need for scripts to generate the types
  */
 
-import {
-  FormatXMLElementFn,
-  IntlMessageFormat,
-  PrimitiveType,
-} from "intl-messageformat";
+import { IntlMessageFormat } from "intl-messageformat";
 import React from "react";
 
 // const intl = {
@@ -23,6 +19,93 @@ import React from "react";
 // }
 
 type UnionKeys<U> = U extends U ? keyof U : never;
+
+/**
+ * Converts a type to keys of an object.
+ * e.g.
+ *
+ * type Values = "foo" | "bar" | "baz";
+ * type Obj = TypeToObjKeys<Values, any>;
+ *
+ * Obj -> {
+ *  foo: any;
+ *  bar: any;
+ *  baz: any;
+ * }
+ */
+type TypeToObjKeys<Type extends string, Value> = {
+  [Key in Type]: Value;
+};
+
+/**
+ * Extracts variable values out of an internationalised string.
+ * e.g.
+ *
+ * type Message = "{greeting} {name}! I'm Dallan.";
+ * type Values = GetVariableValues<Message>;
+ *
+ * Values -> "greeting" | "name"
+ */
+type GetVariableValues<Message extends string> =
+  // Match "{placeholder}" or "{placeholder, number, ::currency:EUR}"
+  Message extends `${string}{${infer Variable}}${infer Tail}`
+    ? // Match "{placeholder, number, ::currency:EUR}"
+      Variable extends `${infer Name},${string}`
+      ? Name | GetVariableValues<Tail>
+      : // Match "{placeholder}"
+        Variable | GetVariableValues<Tail>
+    : never;
+
+/**
+ * Extracts XML values out of an internationalised string.
+ * e.g.
+ *
+ * type Message = "I am <strong>strong</strong> and <b>bold</b>.";
+ * type Values = GetXMLValues<Message>;
+ *
+ * Values -> "strong" | "b"
+ */
+type GetXMLValues<Message extends string> =
+  Message extends `${infer Head}</${infer Value}>${infer Tail}`
+    ? Value | GetXMLValues<Head> | GetXMLValues<Tail>
+    : never;
+
+/**
+ * Extracts all values out of an internationalised string.
+ * e.g.
+ *
+ * type Message = "{greeting} {name}! I am <strong>strong</strong> and <b>bold</b>.";
+ * type Values = GetAllValues<Message>;
+ *
+ * Values -> "greeting" | "name" | "strong" | "b"
+ */
+type GetAllValues<Message extends string> =
+  | GetVariableValues<Message>
+  | GetXMLValues<Message>;
+
+/**
+ * Extracts values out of an internationalised string and converts them to an object.
+ * e.g.
+ *
+ * type Messages = {
+ *  "en-nz": {
+ *   "title": "Example title";
+ *   "body": "{greeting} {name}! I am <strong>strong</strong> and <b>bold</b>.";
+ * };
+ *
+ * type ValuesObj = GetValuesFromMessage<Messages, "body">;
+ *
+ * ValuesObj -> {
+ *  greeting: any;
+ *  name: any;
+ *  strong: any;
+ *  b: any;
+ * }
+ */
+type GetValuesFromMessage<Message extends string> = TypeToObjKeys<
+  GetAllValues<Message>,
+  any
+>;
 
 function createIntl<
   LocaleType extends string,
@@ -82,18 +165,20 @@ function createIntl<
   ) {
     const { locale } = useIntlContext();
 
-    function formatMessage<T = void>(
-      id: MessageKeys,
-      values?: Record<
-        string,
-        PrimitiveType | T | FormatXMLElementFn<T, string | T | (string | T)[]>
-      >
+    // TODO: Make values mandatory when required & make it not when not.
+    function formatMessage<Id extends MessageKeys>(
+      id: Id,
+      values: GetAllValues<typeof intl[typeof locale][typeof id]> extends never
+        ? undefined
+        : GetValuesFromMessage<typeof intl[typeof locale][typeof id]>
     ) {
       if (!values) {
         return intl[locale][id] as string;
       }
 
-      return new IntlMessageFormat(intl[locale][id], locale).format(values);
+      return new IntlMessageFormat(intl[locale][id], locale).format<string>(
+        values
+      );
     }
 
     return {
@@ -145,3 +230,19 @@ type LocalesFromIntlProvider<IntlProvider extends (...args: any) => any> =
 
 export { createIntl };
 export type { LocalesFromIntlProvider };
+
+// const { IntlProvider, defineMessages, useIntl } = createIntl(["en-NZ"]);
+
+// const messages = defineMessages({
+//   "en-NZ": {
+//     example: "Yo {placeholder}",
+//     date: "Today's date is {now, date, ::yyyyMMdd}",
+//   },
+// } as const);
+
+// const { formatMessage } = useIntl(messages);
+
+// formatMessage("example", {
+//   placeholder: "test",
+//   now: "test",
+// });

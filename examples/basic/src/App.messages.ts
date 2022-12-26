@@ -5,4 +5,4 @@ export const messages = defineMessages({
     heading: "Type Safe Intl Basic Example",
     date: "Today's date is {now, date, ::yyyyMMdd}",
   },
-});
+} as const);
