@@ -7,8 +7,9 @@ A fully type-safe internationalisation library for React without the need for co
 - [x] Enforce BCP 47 language tags for locales (at runtime, there are way too many to use types)
   - Using `Intl.getCanonicalLocales` to validate locale at runtime.
 - [ ] Add default locale resolution (maybe)
-- [ ] Ability to pass values + plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
-- [ ] Support Date/Time/Number skeleton (maybe)
+- [X] Ability to pass values type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [ ] Plural support with type saftey
+- [X] Support Date/Time/Number skeleton (maybe)
 - [ ] Cache Intl.\* constructors
 - [ ] Cache messages
 - [ ] Runtime validation
@@ -52,10 +53,10 @@ import { defineMessages, useIntl } from "./intl";
 // `defineMessages` enforces that all locales are provided and that they all have the same message ids.
 const messages = defineMessages({
   "en-nz": {
-    hello: "Hello!",
+    hello: "Hello {name}!",
   },
   mi: {
-    hello: "Kia ora!",
+    hello: "Kia ora {name}!",
   },
 });
 
@@ -66,6 +67,10 @@ export function Hello() {
   // correct locales and they have the same message ids.
   const { formatMessage } = useIntl(messages);
 
-  return <h1>{formatMessage("hello")</h1>;
+  return (
+    <h1>{formatMessage("hello", {
+      name: "Jane",
+    })</h1>
+  );
 }
 ```
