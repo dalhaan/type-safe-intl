@@ -2,6 +2,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { defineConfig } from "rollup";
 import dts from "rollup-plugin-dts";
 import esbuild from "rollup-plugin-esbuild";
+import filesize from "rollup-plugin-filesize";
 
 import pkg from "./package.json" assert { type: "json" };
 
@@ -23,7 +24,7 @@ export default defineConfig([
         sourcemap: true,
       },
     ],
-    plugins: [nodeResolve()],
+    plugins: [nodeResolve(), filesize()],
     external,
   },
   // UMD
@@ -42,6 +43,7 @@ export default defineConfig([
         target: "es6",
         minify: true,
       }),
+      filesize(),
     ],
     external,
   },
@@ -58,7 +60,7 @@ export default defineConfig([
         sourcemap: true,
       },
     ],
-    plugins: [nodeResolve()],
+    plugins: [nodeResolve(), filesize()],
     external,
   },
   // Bundle types into single index.d.ts

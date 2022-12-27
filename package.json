@@ -59,6 +59,7 @@
     "rollup": "^3.7.5",
     "rollup-plugin-dts": "^5.0.0",
     "rollup-plugin-esbuild": "^5.0.0",
+    "rollup-plugin-filesize": "^9.1.2",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.1",
@@ -67,5 +68,8 @@
   },
   "peerDependencies": {
     "react": "^16.8 || ^17.0 || ^18.0"
+  },
+  "dependencies": {
+    "intl-messageformat": "^10.2.5"
   }
 }

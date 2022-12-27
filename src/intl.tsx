@@ -2,6 +2,7 @@
  * A fully type safe i18n library without the need for scripts to generate the types
  */
 
+import { IntlMessageFormat } from "intl-messageformat";
 import React from "react";
 
 // const intl = {
@@ -18,6 +19,145 @@ import React from "react";
 // }
 
 type UnionKeys<U> = U extends U ? keyof U : never;
+
+/**
+ * Converts a type to keys of an object.
+ * e.g.
+ *
+ * type Values = "foo" | "bar" | "baz";
+ * type Obj = TypeToObjKeys<Values, any>;
+ *
+ * Obj -> {
+ *  foo: any;
+ *  bar: any;
+ *  baz: any;
+ * }
+ */
+// type TypeToObjKeys<Type extends string, Value> = {
+//   [Key in Type]: Value;
+// };
+
+/**
+ * Maps a placeholder's type string to a type.
+ * e.g. "{now, date}" -> Date | number
+ * e.g. "{amount, number}" -> number
+ */
+// TODO: Map all placeholder types
+type PlaceholderTypes = {
+  number: number;
+  date: Date | number;
+};
+
+/**
+ * Extracts variable values out of an internationalised string.
+ * e.g.
+ *
+ * type Message = "{greeting} {name}! I'm Dallan. That will be {amount, number, ::currency:EUR}";
+ * type Values = GetVariableValues<Message>;
+ *
+ * ```
+ * Values -> {
+ *  greeting: string;
+ *  name: string;
+ *  amount: number;
+ * }
+ * ```
+ */
+// TODO: match plural rules
+type GetVariableValues<Message extends string> =
+  // Match "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+  Message extends `${string}{${infer Variable}}${infer Tail}`
+    ? Variable extends `${infer Name}, ${infer Info}`
+      ? // Match "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+        Info extends `${infer Type extends keyof PlaceholderTypes},${string}`
+        ? // Match "{placeholder, number, ::currency:EUR}"
+          {
+            [K in Name]: PlaceholderTypes[Type];
+          } & GetVariableValues<Tail>
+        : // Match "{placeholder, number}"
+          {
+            [K in Name]: Info extends keyof PlaceholderTypes
+              ? PlaceholderTypes[Info]
+              : any;
+          } & GetVariableValues<Tail>
+      : // Match "{placeholder}"
+        {
+          [K in Variable]: string;
+        } & GetVariableValues<Tail>
+    : unknown;
+
+// type Test =
+//   GetVariableValues<"Hey {placeholder1} and {placeholder2, number, ::currency:EUR} and {placeholder3, date}">;
+
+/**
+ * Extracts XML values out of an internationalised string.
+ * e.g.
+ *
+ * type Message = "I am <strong>strong</strong> and <b>bold</b>.";
+ * type Values = GetXMLValues<Message>;
+ *
+ * ```
+ * Values -> {
+ *  strong: (chunks: any) => React.ReactNode;
+ *  b: (chunks: any) => React.ReactNode;
+ * }
+ * ```
+ */
+type GetXMLValues<Message extends string> =
+  Message extends `${infer Head}</${infer Value}>${infer Tail}`
+    ? {
+        [K in Value]: (chunks: any) => React.ReactNode;
+      } & GetXMLValues<Head> &
+        GetXMLValues<Tail>
+    : unknown;
+
+// type Test2 =
+//   GetXMLValues<"Hey <b>placeholder1</b> and <i>placeholder2</i>, number, ::currency:EUR} and {placeholder3, date}">;
+
+/**
+ * Extracts all values out of an internationalised string.
+ * e.g.
+ *
+ * type Message = "{greeting} {name}! I am <strong>strong</strong> and <b>bold</b>.";
+ * type Values = GetValuesFromMessage<Message>;
+ *
+ * ```
+ * Values -> {
+ *  greeting: string;
+ *  name: string;
+ *  strong: (chunks: any) => React.ReactNode;
+ *  b: (chunks: any) => React.ReactNode;
+ * }
+ * ```
+ */
+type GetValuesFromMessage<Message extends string> =
+  | GetVariableValues<Message> & GetXMLValues<Message>;
+
+// type Test3 = GetValuesFromMessage<"Hey {placeholder}">;
+
+/**
+ * Extracts values out of an internationalised string and converts them to an object.
+ * e.g.
+ *
+ * type Messages = {
+ *  "en-nz": {
+ *   "title": "Example title";
+ *   "body": "{greeting} {name}! I am <strong>strong</strong> and <b>bold</b>.";
+ * };
+ *
+ * type ValuesObj = GetValuesFromMessage<Messages, "body">;
+ *
+ * ValuesObj -> {
+ *  greeting: any;
+ *  name: any;
+ *  strong: any;
+ *  b: any;
+ * }
+ */
+// type GetValuesFromMessage<Message extends string> = TypeToObjKeys<
+//   GetAllValues<Message>,
+//   any
+// >;
 
 function createIntl<
   LocaleType extends string,
@@ -77,9 +217,30 @@ function createIntl<
   ) {
     const { locale } = useIntlContext();
 
-    function formatMessage(id: MessageKeys) {
-      return intl[locale][id] as string;
-    }
+    const formatMessage: {
+      <Id extends MessageKeys>(
+        ...args: GetValuesFromMessage<
+          typeof intl[typeof locale][Id]
+        > extends Record<string, any>
+          ? // If placeholder values, require both `id` and `values` args
+            [
+              id: Id,
+              values: GetValuesFromMessage<typeof intl[typeof locale][Id]>
+            ]
+          : // If no placeholder values, only require the `id` arg
+            [id: Id]
+      ): string | string[];
+    } = (...args) => {
+      const id = args[0];
+      const values = args[1];
+      if (!values) {
+        return intl[locale][id] as string;
+      }
+
+      return new IntlMessageFormat(intl[locale][id], locale).format<string>(
+        values
+      );
+    };
 
     return {
       formatMessage,
@@ -130,3 +291,26 @@ type LocalesFromIntlProvider<IntlProvider extends (...args: any) => any> =
 
 export { createIntl };
 export type { LocalesFromIntlProvider };
+
+// const { IntlProvider, defineMessages, useIntl } = createIntl(["en-NZ"]);
+
+// const messages = defineMessages({
+//   "en-NZ": {
+//     noPlaceholder: "Yo man",
+//     example: "Yo {placeholder} {amount, number, ::currency:EUR} <b>BOLD</b>",
+//     plural: `You have {numPhotos, plural,
+//       =0 {no photos.}
+//       =1 {one photo.}
+//       other {# photos.}
+//     }`,
+//     date: "Today's date is {now, date, ::yyyyMMdd}",
+//   },
+// } as const);
+
+// const { formatMessage } = useIntl(messages);
+
+// formatMessage("example", {
+//   amount: 5,
+//   b: (chunks) => <strong>{chunks}</strong>,
+//   placeholder: "man",
+// });
