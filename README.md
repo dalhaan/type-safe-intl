@@ -7,11 +7,11 @@ A fully type-safe internationalisation library for React without the need for co
 - [x] Enforce BCP 47 language tags for locales (at runtime, there are way too many to use types)
   - Using `Intl.getCanonicalLocales` to validate locale at runtime.
 - [ ] Add default locale resolution (maybe)
-- [X] Ability to pass values type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [x] Ability to pass values type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
 - [ ] Plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
-- [X] Support Date/Time/Number skeleton (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [x] Support Date/Time/Number skeleton (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
 - [ ] Cache Intl.\* constructors
-- [ ] Cache messages
+- [x] Cache messages
 - [ ] Runtime validation
 
 ## Usage
@@ -25,19 +25,14 @@ import { createIntl } from "type-safe-intl";
 // all intl functions & hooks so they can enforce them.
 const { defineMessages, IntlProvider, useIntl } = createIntl(["en-NZ", "mi"]);
 
-export {
-  defineMessages,
-  IntlProvider,
-  useIntl,
-  Locale,
-};
+export { defineMessages, IntlProvider, useIntl, Locale };
 
 // app.tsx
 import { IntlProvider, Locale } from "./intl";
 import { Hello } from "./hello";
 
 function App() {
-  const locale = getLocalFromSomewhere<'en-NZ' | 'mi'>();
+  const locale = getLocalFromSomewhere<"en-NZ" | "mi">();
 
   // `IntlProvider` uses context to tell `useIntl` what locale to use.
   return (
@@ -68,9 +63,11 @@ export function Hello() {
   const { formatMessage } = useIntl(messages);
 
   return (
-    <h1>{formatMessage("hello", {
-      name: "Jane",
-    })}</h1>
+    <h1>
+      {formatMessage("hello", {
+        name: "Jane",
+      })}
+    </h1>
   );
 }
 ```

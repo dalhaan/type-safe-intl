@@ -2,6 +2,10 @@
  * A fully type safe i18n library without the need for scripts to generate the types
  */
 
+import {
+  MessageFormatElement,
+  parse,
+} from "@formatjs/icu-messageformat-parser";
 import { IntlMessageFormat } from "intl-messageformat";
 import React from "react";
 
@@ -164,7 +168,11 @@ function createIntl<
   Locales extends LocaleType[],
   Locale extends Locales[number]
 >(locales: Locales) {
+  // Validate that locales are valid BCP 47 language tags
   validateLocales(locales);
+
+  // Create message AST cache
+  const messageASTCache = new Map<string, MessageFormatElement[]>();
 
   // ------------------------------------------------------------------
   // IntlContext
@@ -205,6 +213,16 @@ function createIntl<
     Base,
     MessageKeys extends UnionKeys<Base[keyof Base]>
   >(intl: Base & Record<Locale, Record<MessageKeys, string>>) {
+    // Parse messages as ASTs and cache them.
+    for (const locale in intl) {
+      // Parse and store messages as ASTs in the AST cache if it doesn't already exist.
+      for (const message of Object.values(intl[locale as Locale])) {
+        if (!messageASTCache.has(message as string)) {
+          messageASTCache.set(message as string, parse(message as string));
+        }
+      }
+    }
+
     return intl;
   }
 
@@ -233,13 +251,17 @@ function createIntl<
     } = (...args) => {
       const id = args[0];
       const values = args[1];
+
+      // If no values are needed, just return the message
       if (!values) {
         return intl[locale][id] as string;
       }
 
-      return new IntlMessageFormat(intl[locale][id], locale).format<string>(
-        values
-      );
+      return new IntlMessageFormat(
+        // Use pre parsed message to format, otherwise use raw message
+        messageASTCache.get(intl[locale][id]) || intl[locale][id],
+        locale
+      ).format<string>(values);
     };
 
     return {
