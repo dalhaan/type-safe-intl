@@ -19,6 +19,7 @@ function App() {
         <p>
           {formatMessage("date", {
             now: Date.now(),
+            b: (chunks) => <strong>{chunks}</strong>,
           })}
         </p>
       </div>
