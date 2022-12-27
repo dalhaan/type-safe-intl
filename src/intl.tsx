@@ -165,13 +165,22 @@ function createIntl<
   ) {
     const { locale } = useIntlContext();
 
-    // TODO: Make values mandatory when required & make it not when not.
-    function formatMessage<Id extends MessageKeys>(
-      id: Id,
-      values: GetAllValues<typeof intl[typeof locale][typeof id]> extends never
-        ? undefined
-        : GetValuesFromMessage<typeof intl[typeof locale][typeof id]>
-    ) {
+    const formatMessage: {
+      <Id extends MessageKeys>(
+        ...args: GetAllValues<typeof intl[typeof locale][Id]> extends never
+          ? // If no placeholder values, only require the `id` arg
+            [id: Id]
+          : // If placeholder values, require both `id` and `values` args
+            [
+              id: Id,
+              values: GetAllValues<typeof intl[typeof locale][Id]> extends never
+                ? undefined
+                : GetValuesFromMessage<typeof intl[typeof locale][Id]>
+            ]
+      ): string | string[];
+    } = (...args) => {
+      const id = args[0];
+      const values = args[1];
       if (!values) {
         return intl[locale][id] as string;
       }
@@ -179,7 +188,7 @@ function createIntl<
       return new IntlMessageFormat(intl[locale][id], locale).format<string>(
         values
       );
-    }
+    };
 
     return {
       formatMessage,
@@ -235,6 +244,7 @@ export type { LocalesFromIntlProvider };
 
 // const messages = defineMessages({
 //   "en-NZ": {
+//     noPlaceholder: "Yo man",
 //     example: "Yo {placeholder}",
 //     date: "Today's date is {now, date, ::yyyyMMdd}",
 //   },
@@ -242,7 +252,4 @@ export type { LocalesFromIntlProvider };
 
 // const { formatMessage } = useIntl(messages);
 
-// formatMessage("example", {
-//   placeholder: "test",
-//   now: "test",
-// });
+// formatMessage("noPlaceholder");
