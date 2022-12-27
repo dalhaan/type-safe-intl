@@ -33,8 +33,13 @@ type UnionKeys<U> = U extends U ? keyof U : never;
  *  baz: any;
  * }
  */
-type TypeToObjKeys<Type extends string, Value> = {
-  [Key in Type]: Value;
+// type TypeToObjKeys<Type extends string, Value> = {
+//   [Key in Type]: Value;
+// };
+
+type PlaceholderTypes = {
+  number: number;
+  date: Date | number;
 };
 
 /**
@@ -47,14 +52,29 @@ type TypeToObjKeys<Type extends string, Value> = {
  * Values -> "greeting" | "name"
  */
 type GetVariableValues<Message extends string> =
-  // Match "{placeholder}" or "{placeholder, number, ::currency:EUR}"
+  // Match "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
   Message extends `${string}{${infer Variable}}${infer Tail}`
-    ? // Match "{placeholder, number, ::currency:EUR}"
-      Variable extends `${infer Name},${string}`
-      ? Name | GetVariableValues<Tail>
+    ? Variable extends `${infer Name}, ${infer Info}`
+      ? // Match "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+        Info extends `${infer Type extends keyof PlaceholderTypes},${string}`
+        ? // Match "{placeholder, number, ::currency:EUR}"
+          {
+            [K in Name]: PlaceholderTypes[Type];
+          } & GetVariableValues<Tail>
+        : // Match "{placeholder, number}"
+          {
+            [K in Name]: Info extends keyof PlaceholderTypes
+              ? PlaceholderTypes[Info]
+              : any;
+          } & GetVariableValues<Tail>
       : // Match "{placeholder}"
-        Variable | GetVariableValues<Tail>
-    : never;
+        {
+          [K in Variable]: string;
+        } & GetVariableValues<Tail>
+    : unknown;
+
+// type Test =
+//   GetVariableValues<"Hey {placeholder1} and {placeholder2, number, ::currency:EUR} and {placeholder3, date}">;
 
 /**
  * Extracts XML values out of an internationalised string.
@@ -67,8 +87,14 @@ type GetVariableValues<Message extends string> =
  */
 type GetXMLValues<Message extends string> =
   Message extends `${infer Head}</${infer Value}>${infer Tail}`
-    ? Value | GetXMLValues<Head> | GetXMLValues<Tail>
-    : never;
+    ? {
+        [K in Value]: (chunks: any) => React.ReactNode;
+      } & GetXMLValues<Head> &
+        GetXMLValues<Tail>
+    : unknown;
+
+// type Test2 =
+//   GetXMLValues<"Hey <b>placeholder1</b> and <i>placeholder2</i>, number, ::currency:EUR} and {placeholder3, date}">;
 
 /**
  * Extracts all values out of an internationalised string.
@@ -79,9 +105,10 @@ type GetXMLValues<Message extends string> =
  *
  * Values -> "greeting" | "name" | "strong" | "b"
  */
-type GetAllValues<Message extends string> =
-  | GetVariableValues<Message>
-  | GetXMLValues<Message>;
+type GetValuesFromMessage<Message extends string> =
+  | GetVariableValues<Message> & GetXMLValues<Message>;
+
+// type Test3 = GetValuesFromMessage<"Hey {placeholder}">;
 
 /**
  * Extracts values out of an internationalised string and converts them to an object.
@@ -102,10 +129,10 @@ type GetAllValues<Message extends string> =
  *  b: any;
  * }
  */
-type GetValuesFromMessage<Message extends string> = TypeToObjKeys<
-  GetAllValues<Message>,
-  any
->;
+// type GetValuesFromMessage<Message extends string> = TypeToObjKeys<
+//   GetAllValues<Message>,
+//   any
+// >;
 
 function createIntl<
   LocaleType extends string,
@@ -167,16 +194,16 @@ function createIntl<
 
     const formatMessage: {
       <Id extends MessageKeys>(
-        ...args: GetAllValues<typeof intl[typeof locale][Id]> extends never
-          ? // If no placeholder values, only require the `id` arg
-            [id: Id]
-          : // If placeholder values, require both `id` and `values` args
+        ...args: GetValuesFromMessage<
+          typeof intl[typeof locale][Id]
+        > extends Record<string, any>
+          ? // If placeholder values, require both `id` and `values` args
             [
               id: Id,
-              values: GetAllValues<typeof intl[typeof locale][Id]> extends never
-                ? undefined
-                : GetValuesFromMessage<typeof intl[typeof locale][Id]>
+              values: GetValuesFromMessage<typeof intl[typeof locale][Id]>
             ]
+          : // If no placeholder values, only require the `id` arg
+            [id: Id]
       ): string | string[];
     } = (...args) => {
       const id = args[0];
@@ -245,11 +272,15 @@ export type { LocalesFromIntlProvider };
 // const messages = defineMessages({
 //   "en-NZ": {
 //     noPlaceholder: "Yo man",
-//     example: "Yo {placeholder}",
+//     example: "Yo {placeholder} {amount, number, ::currency:EUR} <b>BOLD</b>",
 //     date: "Today's date is {now, date, ::yyyyMMdd}",
 //   },
 // } as const);
 
 // const { formatMessage } = useIntl(messages);
 
-// formatMessage("noPlaceholder");
+// formatMessage("example", {
+//   amount: 5,
+//   placeholder: "dsa",
+//   b: (chunks) => <strong>{chunks}</strong>,
+// });
