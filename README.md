@@ -30,7 +30,7 @@ import { createIntl } from "type-safe-intl";
 // all intl functions & hooks so they can enforce them.
 const { defineMessages, IntlProvider, useIntl } = createIntl(["en-NZ", "mi"]);
 
-export { defineMessages, IntlProvider, useIntl, Locale };
+export { defineMessages, IntlProvider, useIntl };
 
 // app.tsx
 import { IntlProvider, Locale } from "./intl";
