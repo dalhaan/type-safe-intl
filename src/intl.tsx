@@ -37,6 +37,12 @@ type UnionKeys<U> = U extends U ? keyof U : never;
 //   [Key in Type]: Value;
 // };
 
+/**
+ * Maps a placeholder's type string to a type.
+ * e.g. "{now, date}" -> Date | number
+ * e.g. "{amount, number}" -> number
+ */
+// TODO: Map all placeholder types
 type PlaceholderTypes = {
   number: number;
   date: Date | number;
@@ -46,10 +52,14 @@ type PlaceholderTypes = {
  * Extracts variable values out of an internationalised string.
  * e.g.
  *
- * type Message = "{greeting} {name}! I'm Dallan.";
+ * type Message = "{greeting} {name}! I'm Dallan. That will be {amount, number, ::currency:EUR}";
  * type Values = GetVariableValues<Message>;
  *
- * Values -> "greeting" | "name"
+ * Values -> {
+ *  greeting: string;
+ *  name: string;
+ *  amount: number;
+ * }
  */
 type GetVariableValues<Message extends string> =
   // Match "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
@@ -83,7 +93,10 @@ type GetVariableValues<Message extends string> =
  * type Message = "I am <strong>strong</strong> and <b>bold</b>.";
  * type Values = GetXMLValues<Message>;
  *
- * Values -> "strong" | "b"
+ * Values -> {
+ *  strong: (chunks: any) => React.ReactNode;
+ *  b: (chunks: any) => React.ReactNode;
+ * }
  */
 type GetXMLValues<Message extends string> =
   Message extends `${infer Head}</${infer Value}>${infer Tail}`
