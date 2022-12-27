@@ -50,6 +50,7 @@ type UnionKeys<U> = U extends U ? keyof U : never;
 type PlaceholderTypes = {
   number: number;
   date: Date | number;
+  time: Date | number;
 };
 
 /**
