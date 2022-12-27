@@ -2,6 +2,7 @@
  * A fully type safe i18n library without the need for scripts to generate the types
  */
 
+import memoize from "@formatjs/fast-memoize";
 import {
   MessageFormatElement,
   parse,
@@ -46,7 +47,7 @@ type UnionKeys<U> = U extends U ? keyof U : never;
  * e.g. "{now, date}" -> Date | number
  * e.g. "{amount, number}" -> number
  */
-// TODO: Map all placeholder types
+// TODO: Map all placeholder types: select, plural, selectordinal
 type PlaceholderTypes = {
   number: number;
   date: Date | number;
@@ -175,6 +176,19 @@ function createIntl<
   // Create message AST cache
   const messageASTCache = new Map<string, MessageFormatElement[]>();
 
+  // Memoise formatters
+  const formatters = {
+    getNumberFormat: memoize(
+      (locale, opts) => new Intl.NumberFormat(locale, opts)
+    ),
+    getDateTimeFormat: memoize(
+      (locale, opts) => new Intl.DateTimeFormat(locale, opts)
+    ),
+    getPluralRules: memoize(
+      (locale, opts) => new Intl.PluralRules(locale, opts)
+    ),
+  };
+
   // ------------------------------------------------------------------
   // IntlContext
   // ------------------------------------------------------------------
@@ -261,7 +275,12 @@ function createIntl<
       return new IntlMessageFormat(
         // Use pre parsed message to format, otherwise use raw message
         messageASTCache.get(intl[locale][id]) || intl[locale][id],
-        locale
+        locale,
+        undefined,
+        // Use memoised formatters
+        {
+          formatters,
+        }
       ).format<string>(values);
     };
 

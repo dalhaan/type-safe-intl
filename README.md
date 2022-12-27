@@ -6,12 +6,17 @@ A fully type-safe internationalisation library for React without the need for co
 
 - [x] Enforce BCP 47 language tags for locales (at runtime, there are way too many to use types)
   - Using `Intl.getCanonicalLocales` to validate locale at runtime.
-- [ ] Add default locale resolution (maybe)
-- [x] Ability to pass values type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
-- [ ] Plural support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [x] Ability to pass placeholders type safely (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+  - [x] "number" type
+  - [x] "date" type
+  - [x] "time" type
 - [x] Support Date/Time/Number skeleton (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
-- [ ] Cache Intl.\* constructors
+- [x] Cache Intl.\* constructors (w/ [@formatjs/fast-memoize](https://github.com/formatjs/formatjs/tree/main/packages/fast-memoize))
 - [x] Cache messages
+- [ ] Add default locale resolution (maybe)
+- [ ] "plural" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [ ] "select" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [ ] "selectordinal" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
 - [ ] Runtime validation
 
 ## Usage

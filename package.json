@@ -70,6 +70,7 @@
     "react": "^16.8 || ^17.0 || ^18.0"
   },
   "dependencies": {
+    "@formatjs/fast-memoize": "^1.2.7",
     "@formatjs/icu-messageformat-parser": "^2.1.14",
     "intl-messageformat": "^10.2.5"
   }
