@@ -70,7 +70,7 @@ export function Hello() {
   return (
     <h1>{formatMessage("hello", {
       name: "Jane",
-    })</h1>
+    })}</h1>
   );
 }
 ```
