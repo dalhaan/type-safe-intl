@@ -55,11 +55,13 @@ type PlaceholderTypes = {
  * type Message = "{greeting} {name}! I'm Dallan. That will be {amount, number, ::currency:EUR}";
  * type Values = GetVariableValues<Message>;
  *
+ * ```
  * Values -> {
  *  greeting: string;
  *  name: string;
  *  amount: number;
  * }
+ * ```
  */
 type GetVariableValues<Message extends string> =
   // Match "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
@@ -93,10 +95,12 @@ type GetVariableValues<Message extends string> =
  * type Message = "I am <strong>strong</strong> and <b>bold</b>.";
  * type Values = GetXMLValues<Message>;
  *
+ * ```
  * Values -> {
  *  strong: (chunks: any) => React.ReactNode;
  *  b: (chunks: any) => React.ReactNode;
  * }
+ * ```
  */
 type GetXMLValues<Message extends string> =
   Message extends `${infer Head}</${infer Value}>${infer Tail}`
@@ -114,9 +118,16 @@ type GetXMLValues<Message extends string> =
  * e.g.
  *
  * type Message = "{greeting} {name}! I am <strong>strong</strong> and <b>bold</b>.";
- * type Values = GetAllValues<Message>;
+ * type Values = GetValuesFromMessage<Message>;
  *
- * Values -> "greeting" | "name" | "strong" | "b"
+ * ```
+ * Values -> {
+ *  greeting: string;
+ *  name: string;
+ *  strong: (chunks: any) => React.ReactNode;
+ *  b: (chunks: any) => React.ReactNode;
+ * }
+ * ```
  */
 type GetValuesFromMessage<Message extends string> =
   | GetVariableValues<Message> & GetXMLValues<Message>;
