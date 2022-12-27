@@ -63,6 +63,7 @@ type PlaceholderTypes = {
  * }
  * ```
  */
+// TODO: match plural rules
 type GetVariableValues<Message extends string> =
   // Match "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
   Message extends `${string}{${infer Variable}}${infer Tail}`
@@ -297,6 +298,11 @@ export type { LocalesFromIntlProvider };
 //   "en-NZ": {
 //     noPlaceholder: "Yo man",
 //     example: "Yo {placeholder} {amount, number, ::currency:EUR} <b>BOLD</b>",
+//     plural: `You have {numPhotos, plural,
+//       =0 {no photos.}
+//       =1 {one photo.}
+//       other {# photos.}
+//     }`,
 //     date: "Today's date is {now, date, ::yyyyMMdd}",
 //   },
 // } as const);
@@ -305,6 +311,6 @@ export type { LocalesFromIntlProvider };
 
 // formatMessage("example", {
 //   amount: 5,
-//   placeholder: "dsa",
 //   b: (chunks) => <strong>{chunks}</strong>,
+//   placeholder: "man",
 // });
