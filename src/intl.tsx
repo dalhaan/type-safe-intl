@@ -47,7 +47,7 @@ type UnionKeys<U> = U extends U ? keyof U : never;
  * e.g. "{now, date}" -> Date | number
  * e.g. "{amount, number}" -> number
  */
-// TODO: Map all placeholder types: select, plural, selectordinal
+// TODO: Map remaining placeholder types: select, plural, selectordinal
 type PlaceholderTypes = {
   number: number;
   date: Date | number;
@@ -58,7 +58,7 @@ type PlaceholderTypes = {
  * Extracts variable values out of an internationalised string.
  * e.g.
  *
- * type Message = "{greeting} {name}! I'm Dallan. That will be {amount, number, ::currency:EUR}";
+ * type Message = "{greeting} {name}! Amount due {amount, number, ::currency:EUR} by {due, date, ::yyyyMMdd}.";
  * type Values = GetVariableValues<Message>;
  *
  * ```
@@ -66,21 +66,22 @@ type PlaceholderTypes = {
  *  greeting: string;
  *  name: string;
  *  amount: number;
+ *  due: Date | number;
  * }
  * ```
  */
 // TODO: match plural rules
 type GetVariableValues<Message extends string> =
-  // Match "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+  // Match "{.+}" e.g. "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
   Message extends `${string}{${infer Variable}}${infer Tail}`
-    ? Variable extends `${infer Name}, ${infer Info}`
-      ? // Match "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+    ? // Match "{.+, .+}" e.g. "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+      Variable extends `${infer Name}, ${infer Info}`
+      ? // Match "{.+, .+,.+}" e.g. "{placeholder, number, ::currency:EUR}"
         Info extends `${infer Type extends keyof PlaceholderTypes},${string}`
-        ? // Match "{placeholder, number, ::currency:EUR}"
-          {
+        ? {
             [K in Name]: PlaceholderTypes[Type];
           } & GetVariableValues<Tail>
-        : // Match "{placeholder, number}"
+        : // Match "{.+,.+}" e.g. "{placeholder, number}"
           {
             [K in Name]: Info extends keyof PlaceholderTypes
               ? PlaceholderTypes[Info]
