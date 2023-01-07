@@ -22,6 +22,11 @@ function App() {
             b: (chunks) => <strong>{chunks}</strong>,
           })}
         </p>
+        <p>
+          {formatMessage("messages", {
+            numMessages: Math.round(Math.random() * 20),
+          })}
+        </p>
       </div>
     </div>
   );
