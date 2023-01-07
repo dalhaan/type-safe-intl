@@ -8,7 +8,7 @@ import {
   parse,
 } from "@formatjs/icu-messageformat-parser";
 import { IntlMessageFormat } from "intl-messageformat";
-import React from "react";
+import React, { useCallback } from "react";
 
 // const intl = {
 //     'en-nz': {
@@ -289,45 +289,51 @@ function createIntl<
           : // If no placeholder values, only require the `id` arg
             [id: Id]
       ): string | string[];
-    } = (...args) => {
-      const id = args[0];
-      const values = args[1];
+    } = useCallback(
+      (...args) => {
+        const id = args[0];
+        const values = args[1];
 
-      // If no values are needed, just return the message
-      if (!values) {
-        return intl[locale][id] as string;
-      }
-
-      return new IntlMessageFormat(
-        // Use pre parsed message to format, otherwise use raw message
-        messageASTCache.get(intl[locale][id]) || intl[locale][id],
-        locale,
-        undefined,
-        // Use memoised formatters
-        {
-          formatters,
+        // If no values are needed, just return the message
+        if (!values) {
+          return intl[locale][id] as string;
         }
-      ).format<string>(values);
-    };
 
-    function FormatMessage<Id extends MessageKeys>(
-      props: GetValuesFromMessage<
-        typeof intl[typeof locale][Id]
-      > extends Record<string, any> // If placeholder values, require both `id` and `values` props
-        ? {
-            id: Id;
-            values: GetValuesFromMessage<typeof intl[typeof locale][Id]>;
-          } // If no placeholder values, only require the `id` prop
-        : { id: Id }
-    ) {
-      if ("values" in props) {
+        return new IntlMessageFormat(
+          // Use pre parsed message to format, otherwise use raw message
+          messageASTCache.get(intl[locale][id]) || intl[locale][id],
+          locale,
+          undefined,
+          // Use memoised formatters
+          {
+            formatters,
+          }
+        ).format<string>(values);
+      },
+      [locale]
+    );
+
+    const FormatMessage = useCallback(
+      <Id extends MessageKeys>(
+        props: GetValuesFromMessage<
+          typeof intl[typeof locale][Id]
+        > extends Record<string, any> // If placeholder values, require both `id` and `values` props
+          ? {
+              id: Id;
+              values: GetValuesFromMessage<typeof intl[typeof locale][Id]>;
+            } // If no placeholder values, only require the `id` prop
+          : { id: Id }
+      ) => {
+        if ("values" in props) {
+          // @ts-expect-error TypeScript cannot determine if the args are valid.
+          return <>{formatMessage(props.id, props.values)}</>;
+        }
+
         // @ts-expect-error TypeScript cannot determine if the args are valid.
-        return <>{formatMessage(props.id, props.values)}</>;
-      }
-
-      // @ts-expect-error TypeScript cannot determine if the args are valid.
-      return <>{formatMessage(props.id)}</>;
-    }
+        return <>{formatMessage(props.id)}</>;
+      },
+      [formatMessage]
+    );
 
     return {
       formatMessage,
