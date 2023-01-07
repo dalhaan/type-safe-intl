@@ -36,6 +36,10 @@ export default defineConfig([
         name: "TypeSafeIntl",
         format: "umd",
         exports: "named",
+        globals: {
+          // TODO: Add remaining globals for dependencies
+          react: "React",
+        },
       },
     ],
     plugins: [
