@@ -49,6 +49,7 @@ export default defineConfig([
       }),
       filesize(),
     ],
+    // TODO: Bundle dependencies
     external,
   },
   // ES
