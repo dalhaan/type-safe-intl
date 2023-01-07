@@ -14,10 +14,11 @@ A fully type-safe internationalisation library for React without the need for co
 - [x] Cache Intl.\* constructors (w/ [@formatjs/fast-memoize](https://github.com/formatjs/formatjs/tree/main/packages/fast-memoize))
 - [x] Cache messages
 - [ ] Add default locale resolution (maybe)
-- [ ] "plural" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
+- [x] "plural" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
 - [ ] "select" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
 - [ ] "selectordinal" support with type saftey (w/ [intl-messageformat](https://formatjs.io/docs/intl-messageformat/))
 - [ ] Runtime validation
+- [ ] Character escaping
 
 ## Usage
 
@@ -52,11 +53,17 @@ import { defineMessages, useIntl } from "./intl";
 
 // `defineMessages` enforces that all locales are provided and that they all have the same message ids.
 const messages = defineMessages({
-  "en-nz": {
-    hello: "Hello {name}!",
+  "en-NZ": {
+    hello: `Hello {name}! You have {numMessages, plural,
+      =0 {no messages.}
+      =1 {one message.}
+      other {# messages.}} @ {now, date, ::yyyyMMdd}`,
   },
   mi: {
-    hello: "Kia ora {name}!",
+    hello: `Kia ora {name}! {numMessages, plural,
+      =0 {Karekau he karere.}
+      =1 {Kotahi to karere.}
+      other {E # au karere.}} @ {now, date, ::yyyyMMdd}`,
   },
 });
 
@@ -71,8 +78,25 @@ export function Hello() {
     <h1>
       {formatMessage("hello", {
         name: "Jane",
+        numMessages: 5,
+        now: Date.now(),
       })}
     </h1>
   );
 }
+```
+
+## Plurals
+
+Plurals are defined using the standard ICU message format for plurals.
+
+**IMPORTANT:** The plural statement must end with "}}", the closing curly brackets cannot be on different lines or have spaces between them. This is due to a limitation with TypeScript.
+
+e.g.
+
+```
+`{numMessages, plural,
+      =0 {Karekau he karere.}
+      =1 {Kotahi to karere.}
+      other {E # au karere.}}`
 ```

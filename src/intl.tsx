@@ -47,12 +47,33 @@ type UnionKeys<U> = U extends U ? keyof U : never;
  * e.g. "{now, date}" -> Date | number
  * e.g. "{amount, number}" -> number
  */
-// TODO: Map remaining placeholder types: select, plural, selectordinal
+// TODO: Map remaining placeholder types: select, selectordinal
 type PlaceholderTypes = {
   number: number;
   date: Date | number;
   time: Date | number;
+  plural: number;
 };
+
+/**
+ * Get remaining string after plural statement.
+ * IMPORTANT: Plural statement must end with "}}".
+ *
+ * e.g.
+ * `You have {numPhotos, plural,
+ *    =0 {no photos.}
+ *    =1 {one photo.}
+ *    other {# photos.}}REMAINING`
+ *
+ * returns "REMAINING"
+ *
+ *
+ */
+type GetRemainingAfterPlural<Tail extends string> =
+  // Match ".*}}(Remaining:.*)"
+  Tail extends `${string}}}${infer Remaining extends string}`
+    ? Remaining
+    : unknown;
 
 /**
  * Extracts variable values out of an internationalised string.
@@ -70,17 +91,23 @@ type PlaceholderTypes = {
  * }
  * ```
  */
-// TODO: match plural rules
-type GetVariableValues<Message extends string> =
+// TODO: Match remaining placeholder types: select, selectordinal
+type GetVariableValues<Message extends string | unknown> =
   // Match "{.+}" e.g. "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
   Message extends `${string}{${infer Variable}}${infer Tail}`
     ? // Match "{.+, .+}" e.g. "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
       Variable extends `${infer Name}, ${infer Info}`
       ? // Match "{.+, .+,.+}" e.g. "{placeholder, number, ::currency:EUR}"
         Info extends `${infer Type extends keyof PlaceholderTypes},${string}`
-        ? {
-            [K in Name]: PlaceholderTypes[Type];
-          } & GetVariableValues<Tail>
+        ? Type extends "plural"
+          ? // Plural
+            {
+              [K in Name]: PlaceholderTypes[Type];
+            } & GetVariableValues<GetRemainingAfterPlural<Tail>>
+          : // Other
+            {
+              [K in Name]: PlaceholderTypes[Type];
+            } & GetVariableValues<Tail>
         : // Match "{.+,.+}" e.g. "{placeholder, number}"
           {
             [K in Name]: Info extends keyof PlaceholderTypes
@@ -344,16 +371,14 @@ export type { LocalesFromIntlProvider };
 //     plural: `You have {numPhotos, plural,
 //       =0 {no photos.}
 //       =1 {one photo.}
-//       other {# photos.}
-//     }`,
+//       other {# photos.}} as of {now, date, ::yyyyMMdd}.`,
 //     date: "Today's date is {now, date, ::yyyyMMdd}",
 //   },
 // } as const);
 
 // const { formatMessage } = useIntl(messages);
 
-// formatMessage("example", {
-//   amount: 5,
-//   b: (chunks) => <strong>{chunks}</strong>,
-//   placeholder: "man",
+// formatMessage("plural", {
+//   now: Date.now(),
+//   numPhotos: 5,
 // });
