@@ -310,8 +310,28 @@ function createIntl<
       ).format<string>(values);
     };
 
+    function FormatMessage<Id extends MessageKeys>(
+      props: GetValuesFromMessage<
+        typeof intl[typeof locale][Id]
+      > extends Record<string, any> // If placeholder values, require both `id` and `values` props
+        ? {
+            id: Id;
+            values: GetValuesFromMessage<typeof intl[typeof locale][Id]>;
+          } // If no placeholder values, only require the `id` prop
+        : { id: Id }
+    ) {
+      if ("values" in props) {
+        // @ts-expect-error TypeScript cannot determine if the args are valid.
+        return <>{formatMessage(props.id, props.values)}</>;
+      }
+
+      // @ts-expect-error TypeScript cannot determine if the args are valid.
+      return <>{formatMessage(props.id)}</>;
+    }
+
     return {
       formatMessage,
+      FormatMessage,
     };
   }
 

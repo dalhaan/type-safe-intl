@@ -7,25 +7,31 @@ import { useIntl } from "./intl";
 function App() {
   const [count, setCount] = useState(0);
 
-  const { formatMessage } = useIntl(messages);
+  const { formatMessage, FormatMessage } = useIntl(messages);
 
   return (
     <div className="App">
       <h1>{formatMessage("heading")}</h1>
+
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+          <FormatMessage
+            id="count"
+            values={{
+              count,
+            }}
+          />
         </button>
+
         <p>
-          {formatMessage("date", {
-            now: Date.now(),
-            b: (chunks) => <strong>{chunks}</strong>,
-          })}
-        </p>
-        <p>
-          {formatMessage("messages", {
-            numMessages: Math.round(Math.random() * 20),
-          })}
+          <FormatMessage
+            id="messages"
+            values={{
+              numMessages: Math.round(Math.random() * 20),
+              now: Date.now(),
+              b: (chunks) => <strong>{chunks}</strong>,
+            }}
+          />
         </p>
       </div>
     </div>
