@@ -66,8 +66,6 @@ type PlaceholderTypes = {
  *    other {# photos.}}REMAINING`
  *
  * returns "REMAINING"
- *
- *
  */
 type GetRemainingAfterPlural<Tail extends string> =
   // Match ".*}}(Remaining:.*)"
