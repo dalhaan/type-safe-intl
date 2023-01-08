@@ -2,6 +2,10 @@
 
 A fully type-safe internationalisation library for React without the need for code generation.
 
+This library statically analyses your locale messages to give you intellisense for any placeholder variables and XML tags to ensure you don't miss any which could result in runtime bugs. It also ensures that you have provided the translations required for all the locales you wish to support.
+
+Internally, Type Safe Intl uses [intl-messageformat](https://formatjs.io/docs/intl-messageformat/) to format your messages so uses the same intl message format as [react-intl](https://www.npmjs.com/package/react-intl) and [react-aria](https://www.npmjs.com/package/react-aria).
+
 **TODO:**
 
 - [x] Enforce BCP 47 language tags for locales (at runtime, there are way too many to use types)
