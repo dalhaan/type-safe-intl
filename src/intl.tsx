@@ -8,7 +8,7 @@ import {
   parse,
 } from "@formatjs/icu-messageformat-parser";
 import { IntlMessageFormat } from "intl-messageformat";
-import React, { useCallback } from "react";
+import React from "react";
 
 // const intl = {
 //     'en-nz': {
@@ -193,7 +193,7 @@ type GetValuesFromMessage<Message extends string> =
 
 function createIntl<
   LocaleType extends string,
-  Locales extends LocaleType[],
+  Locales extends readonly LocaleType[],
   Locale extends Locales[number]
 >(locales: Locales) {
   // Validate that locales are valid BCP 47 language tags
@@ -222,6 +222,7 @@ function createIntl<
   const IntlContext = React.createContext<
     | {
         locale: Locale;
+        setLocale: (locale: Locale) => void;
       }
     | undefined
   >(undefined);
@@ -230,9 +231,13 @@ function createIntl<
     locale: Locale;
   }>;
 
-  function IntlProvider({ locale, children }: IntlProviderType) {
+  function IntlProvider({ locale: localeProp, children }: IntlProviderType) {
+    const [locale, setLocale] = React.useState<Locale>(localeProp);
+
     return (
-      <IntlContext.Provider value={{ locale }}>{children}</IntlContext.Provider>
+      <IntlContext.Provider value={{ locale, setLocale }}>
+        {children}
+      </IntlContext.Provider>
     );
   }
 
@@ -276,6 +281,10 @@ function createIntl<
   ) {
     const { locale } = useIntlContext();
 
+    // ------------------------------------------------------------------
+    // formatMessage
+    // ------------------------------------------------------------------
+
     const formatMessage: {
       <Id extends MessageKeys>(
         ...args: GetValuesFromMessage<
@@ -289,7 +298,7 @@ function createIntl<
           : // If no placeholder values, only require the `id` arg
             [id: Id]
       ): string | string[];
-    } = useCallback(
+    } = React.useCallback(
       (...args) => {
         const id = args[0];
         const values = args[1];
@@ -313,7 +322,11 @@ function createIntl<
       [locale]
     );
 
-    const FormatMessage = useCallback(
+    // ------------------------------------------------------------------
+    // FormatMessage
+    // ------------------------------------------------------------------
+
+    const FormatMessage = React.useCallback(
       <Id extends MessageKeys>(
         props: GetValuesFromMessage<
           typeof intl[typeof locale][Id]
@@ -343,6 +356,7 @@ function createIntl<
 
   return {
     IntlProvider,
+    useIntlContext,
     useIntl,
     defineMessages,
   };
@@ -352,7 +366,7 @@ function createIntl<
  * Validates an array of locales.
  * Throws an error if they either don't exist or are of the incorrect format.
  */
-function validateLocales(locales: string[]) {
+function validateLocales(locales: readonly string[]) {
   const errors: string[] = [];
 
   for (const localeTag of locales) {
@@ -385,6 +399,8 @@ type LocalesFromIntlProvider<IntlProvider extends (...args: any) => any> =
 
 export { createIntl };
 export type { LocalesFromIntlProvider };
+
+// ------------------------------------------------------------------
 
 // const { IntlProvider, defineMessages, useIntl } = createIntl(["en-NZ"]);
 

@@ -9,4 +9,12 @@ export const messages = defineMessages({
       =1 {one message}
       other {# messages}} as of <b>{now, date, ::yyyyMMdd}</b>.`,
   },
+  "fr-FR": {
+    heading: "Type Safe Intl Basic Example FR",
+    count: "count is {count, number} FR",
+    messages: `You have {numMessages, plural,
+      =0 {no messages}
+      =1 {one message}
+      other {# messages}} as of <b>{now, date, ::yyyyMMdd}</b>. FR`,
+  },
 } as const);

@@ -1,5 +1,7 @@
 import { createIntl } from "type-safe-intl";
 
-const { IntlProvider, defineMessages, useIntl } = createIntl(["en-NZ"]);
+export const LOCALES = ["en-NZ", "fr-FR"] as const;
+export type Locale = typeof LOCALES[number];
 
-export { IntlProvider, defineMessages, useIntl };
+export const { IntlProvider, defineMessages, useIntl, useIntlContext } =
+  createIntl(LOCALES);
