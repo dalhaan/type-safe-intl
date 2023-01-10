@@ -1,6 +1,6 @@
-import { defineMessages } from "./intl";
+import { defineTranslations } from "./intl";
 
-export const messages = defineMessages({
+export const messages = defineTranslations({
   "en-NZ": {
     heading: "Type Safe Intl Basic Example",
     count: "count is {count, number}",

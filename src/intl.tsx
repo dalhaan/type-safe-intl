@@ -93,9 +93,9 @@ type GetRemainingAfterPlural<Tail extends string> =
 type GetVariableValues<Message extends string | unknown> =
   // Match "{.+}" e.g. "{placeholder}" or "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
   Message extends `${string}{${infer Variable}}${infer Tail}`
-    ? // Match "{.+, .+}" e.g. "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
+    ? // Match "{(Name:.+), (Info:.+)}" e.g. "{placeholder, number}" or "{placeholder, number, ::currency:EUR}"
       Variable extends `${infer Name}, ${infer Info}`
-      ? // Match "{.+, .+,.+}" e.g. "{placeholder, number, ::currency:EUR}"
+      ? // Match "{(Name:.+), (Type:.+),.+}" e.g. "{placeholder, number, ::currency:EUR}"
         Info extends `${infer Type extends keyof PlaceholderTypes},${string}`
         ? Type extends "plural"
           ? // Plural
@@ -106,13 +106,13 @@ type GetVariableValues<Message extends string | unknown> =
             {
               [K in Name]: PlaceholderTypes[Type];
             } & GetVariableValues<Tail>
-        : // Match "{.+,.+}" e.g. "{placeholder, number}"
+        : // Match "{(Name:.+), (Info:.+)}" e.g. "{placeholder, number}"
           {
             [K in Name]: Info extends keyof PlaceholderTypes
               ? PlaceholderTypes[Info]
               : any;
           } & GetVariableValues<Tail>
-      : // Match "{placeholder}"
+      : // Match "{(Variable:.+)}"
         {
           [K in Variable]: string;
         } & GetVariableValues<Tail>
@@ -255,30 +255,31 @@ function createIntl<
   // generateIntl
   // ------------------------------------------------------------------
 
-  function defineMessages<
-    Base,
-    MessageKeys extends UnionKeys<Base[keyof Base]>
-  >(intl: Base & Record<Locale, Record<MessageKeys, string>>) {
+  function defineTranslations<
+    Translations,
+    MessageKeys extends UnionKeys<Translations[keyof Translations]>
+  >(translations: Translations & Record<Locale, Record<MessageKeys, string>>) {
     // Parse messages as ASTs and cache them.
-    for (const locale in intl) {
+    for (const locale in translations) {
       // Parse and store messages as ASTs in the AST cache if it doesn't already exist.
-      for (const message of Object.values(intl[locale as Locale])) {
+      for (const message of Object.values(translations[locale as Locale])) {
         if (!messageASTCache.has(message as string)) {
           messageASTCache.set(message as string, parse(message as string));
         }
       }
     }
 
-    return intl;
+    return translations;
   }
 
   // ------------------------------------------------------------------
   // useIntl
   // ------------------------------------------------------------------
 
-  function useIntl<Base, MessageKeys extends UnionKeys<Base[keyof Base]>>(
-    intl: Base & Record<Locale, Record<MessageKeys, string>>
-  ) {
+  function useIntl<
+    Translations,
+    MessageKeys extends UnionKeys<Translations[keyof Translations]>
+  >(translations: Translations & Record<Locale, Record<MessageKeys, string>>) {
     const { locale } = useIntlContext();
 
     // ------------------------------------------------------------------
@@ -288,12 +289,14 @@ function createIntl<
     const formatMessage: {
       <Id extends MessageKeys>(
         ...args: GetValuesFromMessage<
-          typeof intl[typeof locale][Id]
+          typeof translations[typeof locale][Id]
         > extends Record<string, any>
           ? // If placeholder values, require both `id` and `values` args
             [
               id: Id,
-              values: GetValuesFromMessage<typeof intl[typeof locale][Id]>
+              values: GetValuesFromMessage<
+                typeof translations[typeof locale][Id]
+              >
             ]
           : // If no placeholder values, only require the `id` arg
             [id: Id]
@@ -305,12 +308,13 @@ function createIntl<
 
         // If no values are needed, just return the message
         if (!values) {
-          return intl[locale][id] as string;
+          return translations[locale][id] as string;
         }
 
         return new IntlMessageFormat(
           // Use pre parsed message to format, otherwise use raw message
-          messageASTCache.get(intl[locale][id]) || intl[locale][id],
+          messageASTCache.get(translations[locale][id]) ||
+            translations[locale][id],
           locale,
           undefined,
           // Use memoised formatters
@@ -329,11 +333,13 @@ function createIntl<
     const FormatMessage = React.useCallback(
       <Id extends MessageKeys>(
         props: GetValuesFromMessage<
-          typeof intl[typeof locale][Id]
+          typeof translations[typeof locale][Id]
         > extends Record<string, any> // If placeholder values, require both `id` and `values` props
           ? {
               id: Id;
-              values: GetValuesFromMessage<typeof intl[typeof locale][Id]>;
+              values: GetValuesFromMessage<
+                typeof translations[typeof locale][Id]
+              >;
             } // If no placeholder values, only require the `id` prop
           : { id: Id }
       ) => {
@@ -358,7 +364,7 @@ function createIntl<
     IntlProvider,
     useIntlContext,
     useIntl,
-    defineMessages,
+    defineTranslations,
   };
 }
 

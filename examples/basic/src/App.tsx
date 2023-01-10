@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo, useState } from "react";
 
 import "./App.css";
-import { messages } from "./App.messages";
+import { messages } from "./App.translations";
 import { LOCALES, Locale, useIntl, useIntlContext } from "./intl";
 
 function App() {
