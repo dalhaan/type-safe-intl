@@ -114,7 +114,7 @@ type GetVariableValues<Message extends string | unknown> =
           } & GetVariableValues<Tail>
       : // Match "{(Variable:.+)}"
         {
-          [K in Variable]: string;
+          [K in Variable]: any;
         } & GetVariableValues<Tail>
     : unknown;
 
