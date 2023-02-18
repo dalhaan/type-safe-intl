@@ -24,6 +24,11 @@ import React from "react";
 // }
 
 type UnionKeys<U> = U extends U ? keyof U : never;
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never;
 
 /**
  * Converts a type to keys of an object.
@@ -162,8 +167,9 @@ type GetXMLValues<Message extends string> =
  * }
  * ```
  */
-type GetValuesFromMessage<Message extends string> =
-  | GetVariableValues<Message> & GetXMLValues<Message>;
+type GetValuesFromMessage<Message extends string> = UnionToIntersection<
+  GetVariableValues<Message> & GetXMLValues<Message>
+>;
 
 // type Test3 = GetValuesFromMessage<"Hey {placeholder}">;
 
@@ -408,10 +414,22 @@ export type { LocalesFromIntlProvider };
 
 // ------------------------------------------------------------------
 
-// const { IntlProvider, defineMessages, useIntl } = createIntl(["en-NZ"]);
+// const { IntlProvider, defineTranslations, useIntl } = createIntl([
+//   "en-NZ",
+//   "fr",
+// ]);
 
-// const messages = defineMessages({
+// const messages = defineTranslations({
 //   "en-NZ": {
+//     noPlaceholder: "Yo man",
+//     example: "Yo {placeholder} {amount, number, ::currency:EUR} <b>BOLD</b>",
+//     plural: `You have {numPhotos, plural,
+//       =0 {no photos.}
+//       =1 {one photo.}
+//       other {# photos.}} as of {now, date, ::yyyyMMdd}.`,
+//     date: "Today's date is {now, date, ::yyyyMMdd}",
+//   },
+//   fr: {
 //     noPlaceholder: "Yo man",
 //     example: "Yo {placeholder} {amount, number, ::currency:EUR} <b>BOLD</b>",
 //     plural: `You have {numPhotos, plural,
